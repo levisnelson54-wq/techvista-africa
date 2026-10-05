@@ -7,6 +7,13 @@ function App() {
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [selectedArticle, setSelectedArticle] = useState(null);
 
+  // Load saved stories from the browser
+  const [savedArticles, setSavedArticles] = useState(() => {
+    const saved = localStorage.getItem("techvista-saved-articles");
+
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
@@ -39,6 +46,7 @@ function App() {
     });
   }, [searchTerm, activeCategory]);
 
+  // Open a full article
   const openArticle = (article) => {
     setSelectedArticle(article);
 
@@ -48,6 +56,7 @@ function App() {
     });
   };
 
+  // Close the article
   const closeArticle = () => {
     setSelectedArticle(null);
 
@@ -58,7 +67,45 @@ function App() {
     }, 50);
   };
 
+  // Save or remove an article
+  const toggleSavedArticle = (article) => {
+    setSavedArticles((currentSaved) => {
+      const alreadySaved = currentSaved.some(
+        (savedArticle) => savedArticle.id === article.id
+      );
+
+      const updatedSaved = alreadySaved
+        ? currentSaved.filter(
+            (savedArticle) => savedArticle.id !== article.id
+          )
+        : [...currentSaved, article];
+
+      // Store saved stories in the browser
+      localStorage.setItem(
+        "techvista-saved-articles",
+        JSON.stringify(updatedSaved)
+      );
+
+      return updatedSaved;
+    });
+  };
+
+  // Check whether an article is saved
+  const isArticleSaved = (articleId) => {
+    return savedArticles.some(
+      (article) => article.id === articleId
+    );
+  };
+
+  /*
+    ==============================
+    FULL ARTICLE PAGE
+    ==============================
+  */
+
   if (selectedArticle) {
+    const saved = isArticleSaved(selectedArticle.id);
+
     return (
       <div className="app article-page">
         <header className="navbar">
@@ -101,6 +148,20 @@ function App() {
                 <span>•</span>
                 <span>{selectedArticle.readTime}</span>
               </div>
+
+              {/* Save story button */}
+              <button
+                className={
+                  saved
+                    ? "save-article-button saved"
+                    : "save-article-button"
+                }
+                onClick={() =>
+                  toggleSavedArticle(selectedArticle)
+                }
+              >
+                {saved ? "★ Saved" : "☆ Save story"}
+              </button>
             </div>
 
             <div className="article-hero">
@@ -118,9 +179,11 @@ function App() {
             </div>
 
             <div className="article-body">
-              {selectedArticle.content.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              {selectedArticle.content.map(
+                (paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                )
+              )}
             </div>
 
             <div className="article-footer">
@@ -139,15 +202,23 @@ function App() {
           </div>
 
           <p>
-            Building a stronger digital future through technology,
-            skills, and opportunity.
+            Building a stronger digital future through
+            technology, skills, and opportunity.
           </p>
 
-          <small>© 2026 TechVista Africa. Built from Nairobi.</small>
+          <small>
+            © 2026 TechVista Africa. Built from Nairobi.
+          </small>
         </footer>
       </div>
     );
   }
+
+  /*
+    ==============================
+    MAIN TECHVISTA PAGE
+    ==============================
+  */
 
   return (
     <div className="app">
@@ -172,6 +243,8 @@ function App() {
       </header>
 
       <main>
+        {/* HERO */}
+
         <section className="hero">
           <p className="eyebrow">
             AFRICA&apos;S TECHNOLOGY PLATFORM
@@ -206,6 +279,8 @@ function App() {
             </button>
           </div>
         </section>
+
+        {/* PATHS */}
 
         <section className="path-section">
           <div className="section-heading">
@@ -270,6 +345,8 @@ function App() {
           </div>
         </section>
 
+        {/* TECHVISTA PULSE */}
+
         <section className="pulse-section" id="pulse">
           <div className="pulse-header">
             <div>
@@ -283,6 +360,8 @@ function App() {
               stories worth knowing.
             </p>
           </div>
+
+          {/* FEATURED STORY */}
 
           <article className="featured-story">
             <div className="featured-content">
@@ -331,6 +410,8 @@ function App() {
             </div>
           </article>
 
+          {/* SEARCH */}
+
           <div className="pulse-controls">
             <div className="search-box">
               <span>⌕</span>
@@ -356,6 +437,8 @@ function App() {
               )}
             </div>
 
+            {/* CATEGORY FILTERS */}
+
             <div className="category-filters">
               {categories.map((category) => (
                 <button
@@ -374,6 +457,8 @@ function App() {
               ))}
             </div>
           </div>
+
+          {/* ARTICLE RESULTS */}
 
           <div className="pulse-results">
             {filteredArticles.length > 0 ? (
@@ -417,8 +502,43 @@ function App() {
               </div>
             )}
           </div>
+
+          {/* SAVED STORIES */}
+
+          {savedArticles.length > 0 && (
+            <div className="saved-preview">
+              <div>
+                <span className="eyebrow">YOUR STORIES</span>
+
+                <h3>
+                  {savedArticles.length} saved{" "}
+                  {savedArticles.length === 1
+                    ? "story"
+                    : "stories"}
+                </h3>
+              </div>
+
+              <div className="saved-list">
+                {savedArticles.map((article) => (
+                  <button
+                    key={article.id}
+                    className="saved-story"
+                    onClick={() => openArticle(article)}
+                  >
+                    <span>{article.label}</span>
+
+                    <strong>{article.title}</strong>
+
+                    <small>Read story →</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       </main>
+
+      {/* FOOTER */}
 
       <footer id="about">
         <div className="logo">
@@ -430,7 +550,9 @@ function App() {
           technology, skills, and opportunity.
         </p>
 
-        <small>© 2026 TechVista Africa. Built from Nairobi.</small>
+        <small>
+          © 2026 TechVista Africa. Built from Nairobi.
+        </small>
       </footer>
     </div>
   );
