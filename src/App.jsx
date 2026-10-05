@@ -191,6 +191,45 @@ function App() {
             </p>
           </div>
 
+          <article className="featured-story">
+            <div className="featured-content">
+              <span className="featured-label">⭐ FEATURED STORY</span>
+
+              <p className="featured-category">AFRICAN TECH</p>
+
+              <h3>
+                The future of technology is being built across Africa
+              </h3>
+
+              <p className="featured-description">
+                From ambitious developers to fast-growing startups, Africa is
+                building new technology, solving local problems, and creating
+                opportunities for the next generation.
+              </p>
+
+              <button
+                className="featured-button"
+                onClick={() => setActiveCategory("AFRICAN TECH")}
+              >
+                Explore African Tech →
+              </button>
+            </div>
+
+            <div className="featured-visual">
+              <span>TECHVISTA</span>
+
+              <strong>01</strong>
+
+              <p>
+                Ideas
+                <br />
+                becoming
+                <br />
+                impact.
+              </p>
+            </div>
+          </article>
+
           <div className="pulse-controls">
             <div className="search-box">
               <span>⌕</span>
