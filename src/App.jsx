@@ -1,6 +1,10 @@
+import { useMemo, useState } from "react";
 import "./App.css";
 
 function App() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("ALL");
+
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
@@ -9,30 +13,59 @@ function App() {
 
   const pulseItems = [
     {
-      category: "AI & INNOVATION",
+      category: "AI",
+      label: "AI & INNOVATION",
       title: "How AI is changing the way we build software",
       description:
         "Explore practical ways developers can use artificial intelligence to learn faster, build better products, and solve real problems.",
     },
     {
-      category: "DEVELOPER WORLD",
+      category: "DEVELOPER",
+      label: "DEVELOPER WORLD",
       title: "The tools shaping the next generation of developers",
       description:
         "Discover frameworks, APIs, development platforms, and workflows helping developers turn ideas into working products.",
     },
     {
       category: "AFRICAN TECH",
+      label: "AFRICAN TECH",
       title: "Africa's technology ecosystem is growing",
       description:
         "Discover startups, developers, digital products, and technology communities creating new opportunities across the continent.",
     },
     {
       category: "OPPORTUNITIES",
+      label: "OPPORTUNITIES",
       title: "Where developers can find their next opportunity",
       description:
         "Explore jobs, freelance work, programs, events, and other opportunities designed for people building technology careers.",
     },
   ];
+
+  const categories = [
+    "ALL",
+    "AI",
+    "DEVELOPER",
+    "AFRICAN TECH",
+    "OPPORTUNITIES",
+  ];
+
+  const filteredPulseItems = useMemo(() => {
+    return pulseItems.filter((item) => {
+      const matchesCategory =
+        activeCategory === "ALL" || item.category === activeCategory;
+
+      const search = searchTerm.toLowerCase().trim();
+
+      const matchesSearch =
+        search === "" ||
+        item.title.toLowerCase().includes(search) ||
+        item.description.toLowerCase().includes(search) ||
+        item.label.toLowerCase().includes(search);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [searchTerm, activeCategory]);
 
   return (
     <div className="app">
@@ -158,18 +191,80 @@ function App() {
             </p>
           </div>
 
-          <div className="pulse-grid">
-            {pulseItems.map((item) => (
-              <article className="pulse-card" key={item.title}>
-                <span>{item.category}</span>
+          <div className="pulse-controls">
+            <div className="search-box">
+              <span>⌕</span>
 
-                <h3>{item.title}</h3>
+              <input
+                type="text"
+                placeholder="Search stories, topics, opportunities..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                aria-label="Search TechVista Pulse"
+              />
 
-                <p>{item.description}</p>
+              {searchTerm && (
+                <button
+                  className="clear-search"
+                  onClick={() => setSearchTerm("")}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
 
-                <button>Read more →</button>
-              </article>
-            ))}
+            <div className="category-filters">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={
+                    activeCategory === category
+                      ? "category-button active"
+                      : "category-button"
+                  }
+                  onClick={() => setActiveCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="pulse-results">
+            {filteredPulseItems.length > 0 ? (
+              filteredPulseItems.map((item) => (
+                <article className="pulse-card" key={item.title}>
+                  <span>{item.label}</span>
+
+                  <h3>{item.title}</h3>
+
+                  <p>{item.description}</p>
+
+                  <button>Read more →</button>
+                </article>
+              ))
+            ) : (
+              <div className="empty-state">
+                <div className="empty-icon">⌕</div>
+
+                <h3>No stories found</h3>
+
+                <p>
+                  We couldn&apos;t find anything matching your search. Try
+                  another topic or category.
+                </p>
+
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setActiveCategory("ALL");
+                  }}
+                >
+                  Reset search
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </main>
