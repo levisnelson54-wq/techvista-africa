@@ -1,46 +1,17 @@
 import { useMemo, useState } from "react";
 import "./App.css";
+import articles from "./data/articles";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
     });
   };
-
-  const pulseItems = [
-    {
-      category: "AI",
-      label: "AI & INNOVATION",
-      title: "How AI is changing the way we build software",
-      description:
-        "Explore practical ways developers can use artificial intelligence to learn faster, build better products, and solve real problems.",
-    },
-    {
-      category: "DEVELOPER",
-      label: "DEVELOPER WORLD",
-      title: "The tools shaping the next generation of developers",
-      description:
-        "Discover frameworks, APIs, development platforms, and workflows helping developers turn ideas into working products.",
-    },
-    {
-      category: "AFRICAN TECH",
-      label: "AFRICAN TECH",
-      title: "Africa's technology ecosystem is growing",
-      description:
-        "Discover startups, developers, digital products, and technology communities creating new opportunities across the continent.",
-    },
-    {
-      category: "OPPORTUNITIES",
-      label: "OPPORTUNITIES",
-      title: "Where developers can find their next opportunity",
-      description:
-        "Explore jobs, freelance work, programs, events, and other opportunities designed for people building technology careers.",
-    },
-  ];
 
   const categories = [
     "ALL",
@@ -50,22 +21,133 @@ function App() {
     "OPPORTUNITIES",
   ];
 
-  const filteredPulseItems = useMemo(() => {
-    return pulseItems.filter((item) => {
+  const filteredArticles = useMemo(() => {
+    return articles.filter((article) => {
       const matchesCategory =
-        activeCategory === "ALL" || item.category === activeCategory;
+        activeCategory === "ALL" ||
+        article.category === activeCategory;
 
       const search = searchTerm.toLowerCase().trim();
 
       const matchesSearch =
         search === "" ||
-        item.title.toLowerCase().includes(search) ||
-        item.description.toLowerCase().includes(search) ||
-        item.label.toLowerCase().includes(search);
+        article.title.toLowerCase().includes(search) ||
+        article.description.toLowerCase().includes(search) ||
+        article.label.toLowerCase().includes(search);
 
       return matchesCategory && matchesSearch;
     });
   }, [searchTerm, activeCategory]);
+
+  const openArticle = (article) => {
+    setSelectedArticle(article);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const closeArticle = () => {
+    setSelectedArticle(null);
+
+    setTimeout(() => {
+      document.getElementById("pulse")?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }, 50);
+  };
+
+  if (selectedArticle) {
+    return (
+      <div className="app article-page">
+        <header className="navbar">
+          <div className="logo">
+            TechVista<span>Africa</span>
+          </div>
+
+          <button
+            className="nav-button"
+            onClick={closeArticle}
+          >
+            ← Back to Pulse
+          </button>
+        </header>
+
+        <main>
+          <article className="article-container">
+            <button
+              className="article-back"
+              onClick={closeArticle}
+            >
+              ← Back to TechVista Pulse
+            </button>
+
+            <div className="article-header">
+              <span className="article-category">
+                {selectedArticle.label}
+              </span>
+
+              <h1>{selectedArticle.title}</h1>
+
+              <p className="article-description">
+                {selectedArticle.description}
+              </p>
+
+              <div className="article-meta">
+                <span>{selectedArticle.author}</span>
+                <span>•</span>
+                <span>{selectedArticle.date}</span>
+                <span>•</span>
+                <span>{selectedArticle.readTime}</span>
+              </div>
+            </div>
+
+            <div className="article-hero">
+              <span>TECHVISTA</span>
+
+              <strong>01</strong>
+
+              <p>
+                Technology
+                <br />
+                shaping
+                <br />
+                tomorrow.
+              </p>
+            </div>
+
+            <div className="article-body">
+              {selectedArticle.content.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+
+            <div className="article-footer">
+              <p>Published by TechVista Africa</p>
+
+              <button onClick={closeArticle}>
+                Explore more stories →
+              </button>
+            </div>
+          </article>
+        </main>
+
+        <footer>
+          <div className="logo">
+            TechVista<span>Africa</span>
+          </div>
+
+          <p>
+            Building a stronger digital future through technology,
+            skills, and opportunity.
+          </p>
+
+          <small>© 2026 TechVista Africa. Built from Nairobi.</small>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
@@ -91,7 +173,9 @@ function App() {
 
       <main>
         <section className="hero">
-          <p className="eyebrow">AFRICA&apos;S TECHNOLOGY PLATFORM</p>
+          <p className="eyebrow">
+            AFRICA&apos;S TECHNOLOGY PLATFORM
+          </p>
 
           <h1>
             Technology.
@@ -102,8 +186,8 @@ function App() {
           </h1>
 
           <p className="hero-text">
-            Discover the knowledge, tools, opportunities, and technology
-            shaping Africa&apos;s digital future.
+            Discover the knowledge, tools, opportunities, and
+            technology shaping Africa&apos;s digital future.
           </p>
 
           <div className="hero-actions">
@@ -125,7 +209,10 @@ function App() {
 
         <section className="path-section">
           <div className="section-heading">
-            <p className="eyebrow">WHERE DO YOU WANT TO GO?</p>
+            <p className="eyebrow">
+              WHERE DO YOU WANT TO GO?
+            </p>
+
             <h2>Choose your path.</h2>
           </div>
 
@@ -136,8 +223,9 @@ function App() {
               <h3>I&apos;m Learning</h3>
 
               <p>
-                Learn programming, AI, web development, APIs, and the skills
-                needed to build your technology career.
+                Learn programming, AI, web development, APIs,
+                and the skills needed to build your technology
+                career.
               </p>
 
               <button onClick={() => scrollToSection("pulse")}>
@@ -151,8 +239,9 @@ function App() {
               <h3>I&apos;m Building</h3>
 
               <p>
-                Discover developer tools, APIs, practical projects, and
-                resources designed to help you turn ideas into products.
+                Discover developer tools, APIs, practical
+                projects, and resources designed to help you
+                turn ideas into products.
               </p>
 
               <button onClick={() => scrollToSection("pulse")}>
@@ -160,14 +249,18 @@ function App() {
               </button>
             </article>
 
-            <article className="path-card" id="opportunities">
+            <article
+              className="path-card"
+              id="opportunities"
+            >
               <span className="card-number">03</span>
 
               <h3>I&apos;m Looking for Opportunities</h3>
 
               <p>
-                Find technology jobs, freelance opportunities, programs,
-                events, and other ways to move your career forward.
+                Find technology jobs, freelance opportunities,
+                programs, events, and other ways to move your
+                career forward.
               </p>
 
               <button onClick={() => scrollToSection("pulse")}>
@@ -186,30 +279,38 @@ function App() {
             </div>
 
             <p className="pulse-intro">
-              Ideas, tools, opportunities, and technology stories worth
-              knowing.
+              Ideas, tools, opportunities, and technology
+              stories worth knowing.
             </p>
           </div>
 
           <article className="featured-story">
             <div className="featured-content">
-              <span className="featured-label">⭐ FEATURED STORY</span>
+              <span className="featured-label">
+                ⭐ FEATURED STORY
+              </span>
 
-              <p className="featured-category">AFRICAN TECH</p>
+              <p className="featured-category">
+                AFRICAN TECH
+              </p>
 
               <h3>
-                The future of technology is being built across Africa
+                The future of technology is being built across
+                Africa
               </h3>
 
               <p className="featured-description">
-                From ambitious developers to fast-growing startups, Africa is
-                building new technology, solving local problems, and creating
+                From ambitious developers to fast-growing
+                startups, Africa is building new technology,
+                solving local problems, and creating
                 opportunities for the next generation.
               </p>
 
               <button
                 className="featured-button"
-                onClick={() => setActiveCategory("AFRICAN TECH")}
+                onClick={() =>
+                  setActiveCategory("AFRICAN TECH")
+                }
               >
                 Explore African Tech →
               </button>
@@ -238,7 +339,9 @@ function App() {
                 type="text"
                 placeholder="Search stories, topics, opportunities..."
                 value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
+                onChange={(event) =>
+                  setSearchTerm(event.target.value)
+                }
                 aria-label="Search TechVista Pulse"
               />
 
@@ -262,7 +365,9 @@ function App() {
                       ? "category-button active"
                       : "category-button"
                   }
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() =>
+                    setActiveCategory(category)
+                  }
                 >
                   {category}
                 </button>
@@ -271,16 +376,23 @@ function App() {
           </div>
 
           <div className="pulse-results">
-            {filteredPulseItems.length > 0 ? (
-              filteredPulseItems.map((item) => (
-                <article className="pulse-card" key={item.title}>
-                  <span>{item.label}</span>
+            {filteredArticles.length > 0 ? (
+              filteredArticles.map((article) => (
+                <article
+                  className="pulse-card"
+                  key={article.id}
+                >
+                  <span>{article.label}</span>
 
-                  <h3>{item.title}</h3>
+                  <h3>{article.title}</h3>
 
-                  <p>{item.description}</p>
+                  <p>{article.description}</p>
 
-                  <button>Read more →</button>
+                  <button
+                    onClick={() => openArticle(article)}
+                  >
+                    Read more →
+                  </button>
                 </article>
               ))
             ) : (
@@ -290,8 +402,8 @@ function App() {
                 <h3>No stories found</h3>
 
                 <p>
-                  We couldn&apos;t find anything matching your search. Try
-                  another topic or category.
+                  We couldn&apos;t find anything matching your
+                  search. Try another topic or category.
                 </p>
 
                 <button
@@ -314,8 +426,8 @@ function App() {
         </div>
 
         <p>
-          Building a stronger digital future through technology, skills, and
-          opportunity.
+          Building a stronger digital future through
+          technology, skills, and opportunity.
         </p>
 
         <small>© 2026 TechVista Africa. Built from Nairobi.</small>
